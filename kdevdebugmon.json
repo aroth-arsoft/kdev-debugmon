@@ -1,0 +1,25 @@
+{
+    "KPlugin": {
+        "Description": "Debug Monitor", 
+        "Description[de]": "Debug Monitor", 
+        "Description[en_GB]": "Debug Monitor", 
+        "Icon": "debugger", 
+        "Id": "kdevdebugmon", 
+        "License": "GPL", 
+        "Name": "Debug Monitor", 
+        "Name[de]": "Debug Monitor", 
+        "Name[en_GB]": "Debug Monitor", 
+        "Name[x-test]": "xxDebug Monitorxx", 
+        "ServiceTypes": [
+            "KDevelop/Plugin"
+        ]
+    }, 
+    "X-KDevelop-Category": "Global", 
+    "X-KDevelop-IRequired": [
+        "org.kdevelop.IExecutePlugin"
+    ], 
+    "X-KDevelop-Interfaces": [
+        "org.kdevelop.IStatus"
+    ], 
+    "X-KDevelop-Mode": "GUI"
+}
