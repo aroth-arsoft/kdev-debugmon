@@ -21,12 +21,69 @@
 
 #include "debugmonplugin.h"
 
+#include <kpluginfactory.h>
+
+#include <sublime/view.h>
+
+#include <interfaces/icore.h>
+#include <interfaces/iuicontroller.h>
+#include <interfaces/idebugcontroller.h>
+#include <interfaces/iplugincontroller.h>
+#include <interfaces/contextmenuextension.h>
+#include <interfaces/context.h>
+
+#include <execute/iexecuteplugin.h>
+
+#include "appperf.h"
 
 namespace DebugMon
 {
 
 K_PLUGIN_FACTORY_WITH_JSON(DebugMonFactory, "kdevdebugmon.json", registerPlugin<DebugMonitorPlugin>(); )
 
+
+template<class T>
+class DebugMonToolFactory : public KDevelop::IToolViewFactory
+{
+public:
+  DebugMonToolFactory(DebugMonitorPlugin* plugin, const QString &id, Qt::DockWidgetArea defaultArea)
+  : m_plugin(plugin), m_id(id), m_defaultArea(defaultArea)
+  {}
+
+  virtual QWidget* create(QWidget *parent = 0) override
+  {
+    return new T(m_plugin, parent);
+  }
+
+  virtual QString id() const override
+  {
+    return m_id;
+  }
+
+  virtual Qt::DockWidgetArea defaultPosition() override
+  {
+    return m_defaultArea;
+  }
+
+  virtual void viewCreated(Sublime::View* view) override
+  {
+      if (view->widget()->metaObject()->indexOfSignal(QMetaObject::normalizedSignature("requestRaise()")) != -1)
+          QObject::connect(view->widget(), SIGNAL(requestRaise()), view, SLOT(requestRaise()));
+  }
+
+  /* At present, some debugger widgets (e.g. breakpoint) contain actions so that shortcuts
+     work, but they don't need any toolbar.  So, suppress toolbar action.  */
+  virtual QList<QAction*> toolBarActions( QWidget* viewWidget ) const override
+  {
+      Q_UNUSED(viewWidget);
+      return QList<QAction*>();
+  }
+
+private:
+  DebugMonitorPlugin* m_plugin;
+  QString m_id;
+  Qt::DockWidgetArea m_defaultArea;
+};
 
 DebugMonitorPlugin::DebugMonitorPlugin( QObject *parent, const QVariantList & ) :
     KDevelop::IPlugin( "kdevgdb", parent ),
@@ -35,15 +92,15 @@ DebugMonitorPlugin::DebugMonitorPlugin( QObject *parent, const QVariantList & ) 
     core()->debugController()->initializeUi();
 
     setXMLFile("kdevdebugmon.rc");
-/*
+
+    appperformancefactory = new DebugMonToolFactory<ApplicationPerformanceWidget>(
+    this, "org.kdevelop.debugmon.Performance",Qt::BottomDockWidgetArea);
+    
     core()->uiController()->addToolView(
-        i18n("GDB"),
-        gdbfactory);
-*/
+        i18n("Performance"),
+        appperformancefactory);
 
     setupActions();
-
-    setupDBus();
 }
 
 void DebugMonitorPlugin::unload()
@@ -54,10 +111,6 @@ void DebugMonitorPlugin::unload()
 void DebugMonitorPlugin::setupActions()
 {
     KActionCollection* ac = actionCollection();
-}
-
-void DebugMonitorPlugin::setupDBus()
-{
 }
 
 DebugMonitorPlugin::~DebugMonitorPlugin()

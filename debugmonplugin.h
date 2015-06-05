@@ -27,11 +27,9 @@
 #include <QtCore/QVariant>
 
 #include <KConfigGroup>
-#include <KTextEditor/Cursor>
 #include <QUrl>
 
 #include <interfaces/iplugin.h>
-#include <interfaces/istatus.h>
 
 class QLabel;
 class QMenu;
@@ -49,11 +47,12 @@ class ProcessLineMaker;
 
 namespace DebugMon
 {
+class ApplicationPerformanceWidget;
+template<typename T> class DebugMonToolFactory;
 
-class DebugMonitorPlugin : public KDevelop::IPlugin, public KDevelop::IStatus
+class DebugMonitorPlugin : public KDevelop::IPlugin
 {
     Q_OBJECT
-    Q_INTERFACES(KDevelop::IStatus)
 
 public:
     DebugMonitorPlugin( QObject *parent, const QVariantList & = QVariantList() );
@@ -62,8 +61,6 @@ public:
     virtual void unload() override;
     
     virtual KDevelop::ContextMenuExtension contextMenuExtension( KDevelop::Context* ) override;
-    
-    DebugSession *createSession();
 
 private Q_SLOTS:
 
@@ -77,6 +74,8 @@ private:
     void setupActions();
 
     KConfigGroup m_config;
+    
+    DebugMonToolFactory< ApplicationPerformanceWidget >* appperformancefactory;
 };
 
 }

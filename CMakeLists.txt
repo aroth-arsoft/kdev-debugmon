@@ -20,7 +20,7 @@ include(KDECompilerSettings)
 add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS -DQT_NO_URL_CAST_FROM_STRING)
 
 find_package(Qt5 REQUIRED Core Widgets Test)
-find_package(KF5 REQUIRED COMPONENTS ThreadWeaver I18n)
+find_package(KF5 REQUIRED COMPONENTS ThreadWeaver I18n TextEditor ItemModels SysGuard)
 find_package(KDevPlatform ${KDEVPLATFORM_VERSION} REQUIRED)
 find_package(KDevelop REQUIRED)
 
@@ -49,14 +49,19 @@ include_directories(
 
 set(kdevdebugmon_SRCS
     debugmonplugin.cpp
+    appperf.cpp
 )
 
 kdevplatform_add_plugin(kdevdebugmon JSON kdevdebugmon.json SOURCES ${kdevdebugmon_SRCS})
 
 target_link_libraries(kdevdebugmon
     KF5::ThreadWeaver
+    KF5::TextEditor
+    KF5::SysGuard
+    KF5::ProcessUi
     KDev::Util
-    KDev::Project
+    KDev::Interfaces
+    KDev::Sublime
 )
 
 install(FILES kdevdebugmon.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdevdebugmon)

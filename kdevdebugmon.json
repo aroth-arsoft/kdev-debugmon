@@ -18,8 +18,5 @@
     "X-KDevelop-IRequired": [
         "org.kdevelop.IExecutePlugin"
     ], 
-    "X-KDevelop-Interfaces": [
-        "org.kdevelop.IStatus"
-    ], 
     "X-KDevelop-Mode": "GUI"
 }
