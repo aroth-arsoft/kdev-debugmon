@@ -23,12 +23,17 @@
 
 #include <QIcon>
 #include <QVBoxLayout>
-#include <QToolBox>
+#include <QTabWidget>
 #include <QAction>
 
 #include <KLocalizedString>
 
 #include <processui/ksysguardprocesslist.h>
+
+#include <ksgrd/SensorManager.h>
+
+#include "ksysguardui/Workspace.h"
+#include "ksysguardui/SensorBrowser.h"
 
 namespace DebugMon
 {
@@ -36,35 +41,52 @@ class DebugMonitorPlugin;
 
 ApplicationPerformanceWidget::ApplicationPerformanceWidget(DebugMonitorPlugin* plugin, QWidget* parent)
     : QWidget(parent)
+    , plugin_(plugin)
+    , workspace_(NULL)
+    , sensorBrowserWidget_(NULL)
 {
-    setWindowIcon(QIcon::fromTheme("debugger"));
+    setWindowIcon(QIcon::fromTheme("utilities-system-monitor"));
     setWindowTitle(i18n("Performance"));
-
-    QAction * addPerformanceMonitorAction = new QAction(this);
-    addPerformanceMonitorAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-    addPerformanceMonitorAction->setText(i18n("New performance monitor"));
-    addPerformanceMonitorAction->setToolTip(i18nc("@info:tooltip", "Open a new performance monitor."));
-    addPerformanceMonitorAction->setIcon(QIcon::fromTheme("window-new"));
-    connect(addPerformanceMonitorAction, &QAction::triggered, this, &ApplicationPerformanceWidget::slotAddMonitorView);
-    addAction(addPerformanceMonitorAction);
 
     QVBoxLayout *l = new QVBoxLayout(this);
     l->setContentsMargins(0, 0, 0, 0);
 
-    tab_ = new QTabWidget(this);
-    tab_->setContentsMargins(0, 0, 0, 0);
-    l->addWidget(tab_);
+    workspace_ = new Workspace(this);
+    workspace_->setContentsMargins(0, 0, 0, 0);
+    l->addWidget(workspace_);
 
     setLayout(l);
+
+    QAction * newWorksheetAction = new QAction(this);
+    newWorksheetAction->setText(i18n("New worksheet"));
+    newWorksheetAction->setToolTip(i18nc("@info:tooltip", "New worksheet."));
+    newWorksheetAction->setIcon(QIcon::fromTheme("tab-new"));
+    connect(newWorksheetAction, &QAction::triggered, workspace_, &Workspace::newWorkSheet);
+    addAction(newWorksheetAction);
+
+    QAction * showSensorBrowserWidgetAction = new QAction(this);
+    showSensorBrowserWidgetAction->setText(i18n("Show sensors"));
+    showSensorBrowserWidgetAction->setToolTip(i18nc("@info:tooltip", "Shows the list of available sensors."));
+    connect(showSensorBrowserWidgetAction, &QAction::triggered, this, &ApplicationPerformanceWidget::showSensorBrowserWidget);
+    addAction(showSensorBrowserWidgetAction);
     
-    slotAddMonitorView();
+    workspace_->newWorkSheet();
+}
+
+void ApplicationPerformanceWidget::showSensorBrowserWidget()
+{
+    if(!sensorBrowserWidget_) 
+        sensorBrowserWidget_ = new SensorBrowserWidget( this, KSGRD::SensorMgr );
+    sensorBrowserWidget_->show();
 }
 
 void ApplicationPerformanceWidget::slotAddMonitorView()
 {
-    KSysGuardProcessList * widget = new KSysGuardProcessList(this);
+    /*
+    WorkSheet * widget = new WorkSheet(this);
     tab_->addTab(widget, widget->windowTitle());
     tab_->setCurrentIndex(tab_->indexOf(widget));
+    */
     //memoryViews_.push_back(widget);
 }
 

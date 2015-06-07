@@ -24,7 +24,8 @@
 
 #include <QWidget>
 
-class QTabWidget;
+class Workspace;
+class SensorBrowserWidget;
 
 namespace DebugMon
 {
@@ -39,10 +40,12 @@ public:
     
 public slots:
     void slotAddMonitorView();
+    void showSensorBrowserWidget();
 
 private:
-    DebugMonitorPlugin* plugin;
-    QTabWidget * tab_;
+    DebugMonitorPlugin* plugin_;
+    Workspace * workspace_;
+    SensorBrowserWidget * sensorBrowserWidget_;
 };
 
 }

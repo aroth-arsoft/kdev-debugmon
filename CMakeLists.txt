@@ -20,9 +20,18 @@ include(KDECompilerSettings)
 add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS -DQT_NO_URL_CAST_FROM_STRING)
 
 find_package(Qt5 REQUIRED Core Widgets Test)
-find_package(KF5 REQUIRED COMPONENTS ThreadWeaver I18n TextEditor ItemModels SysGuard)
+find_package(KF5 REQUIRED COMPONENTS 
+    ThreadWeaver 
+    I18n 
+    TextEditor 
+    ItemModels 
+    SysGuard
+    NewStuff # for ksysguardui/Workspace.cpp
+    KDELibs4Support #for SensorDisplay.cpp
+    )
 find_package(KDevPlatform ${KDEVPLATFORM_VERSION} REQUIRED)
 find_package(KDevelop REQUIRED)
+
 
 # Turn off missing-field-initializers warning for GCC to avoid noise from false positives with empty {}
 # See discussion: http://mail.kde.org/pipermail/kdevelop-devel/2014-February/046910.html
@@ -45,6 +54,8 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/libs
 )
 
+add_subdirectory(ksysguardui)
+include_directories(ksysguardui ksysguardui/SensorDisplayLib)
 #add_subdirectory(tests)
 
 set(kdevdebugmon_SRCS
@@ -62,6 +73,7 @@ target_link_libraries(kdevdebugmon
     KDev::Util
     KDev::Interfaces
     KDev::Sublime
+    ksysguardui
 )
 
 install(FILES kdevdebugmon.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdevdebugmon)
